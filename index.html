@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
 
-    <title>reveal.js – The HTML Presentation Framework</title>
+    <title>Cacheando fuera de Django</title>
 
     <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
     <meta name="author" content="Hakim El Hattab">
@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
     <link rel="stylesheet" href="css/reveal.css">
-    <link rel="stylesheet" href="css/theme/black.css" id="theme">
+    <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
 
     <!-- Code syntax highlighting -->
     <link rel="stylesheet" href="lib/css/zenburn.css">
@@ -52,16 +52,25 @@
           </p>
         </section>
 
-        <!--section>
-          <h2>Hoja de ruta</h2>
-          <ol>
-            <li class="fragment">Cacheando</li>
-            <li class="fragment">Niveles de cache</li>
-            <li class="fragment">Archivos <i>estáticos</i></li>
-            <li class="fragment">Páginas y APIs</li>
-          </ol>
-        </section-->
+        <section>
+          <h2>RadioCut</h2>
+          <ul>
+            <li><i>"donde la radio se hace viral, on-demand y social"</i></li>
+            <li>1.7M visitas por mes</li>
+            <li>1.2M horas escuchadas por mes</li>
+            <li>Usamos: Django, GAE, Flask, Google Cloud</li>
+            <li>Sobre mí: pythonista desde 2004 / "empresario" o "co-founder"</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Definición</h2>
+          <blockquote cite="https://en.wikipedia.org/wiki/Cache_(computing)" style="width:95%">
+              “a cache is a hardware or software component <strong>that stores data so future requests for that data can be served faster</strong>; the data stored in a cache might be the result of an earlier computation, or the duplicate of data stored elsewhere. A <strong>cache hit</strong> occurs when the requested data can be found in a cache, while a <strong>cache miss</strong> occurs when it cannot. <br/> Cache hits are faster than recomputing a result or reading from a slower data store; thus, the more requests can be served from the cache, the faster the system performs.”
+          </blockquote>
+        </section>
 
+        <section data-background="maxresdefault.png">
+        </section>
         <section>
           <h2>Cacheando</h2>
           <ul>
@@ -70,7 +79,8 @@
               <ul>
                 <li class="fragment">Costo de cálculo</li>
                 <li class="fragment">Ancho de banda</li>
-                <li class="fragment">Cercanía</li>
+                <li class="fragment">Cercanía (latencia)</li>
+                <li class="fragment">Escalabilidad</li>
               </ul>
             </li>
             <li class="fragment">Invalidar (o descachear)</li>
@@ -82,26 +92,26 @@
             <li class="fragment">Browser</li>
             <li class="fragment">CDN</li>
             <li class="fragment">NGINX / Apache</li>
-            <li class="fragment">Django</li>
+            <li class="fragment">Django (memcache)</li>
           </ol>
         </section>
 
         <section>
           <h2>Cache en Django</h2>
-          <pre><code class="python" data-trim contenteditable style="font-size: 18px;">
+          <pre style="width: 95%"><code class="python" data-trim contenteditable style="font-size: 24px;">
 from django.views.decorators.cache import cache_page
 
 @cache_page(60 * 15)
 def my_view(request):
     ...
           </code></pre>
-          <pre><code class="python" data-trim contenteditable style="font-size: 18px;">
+          <pre style="width: 95%"><code class="python" data-trim contenteditable style="font-size: 24px;">
 {% load cache %}
 {% cache 500 sidebar request.user.username %}
     .. sidebar for logged in user ..
 {% endcache %}
           </code></pre>
-          <pre><code class="python" data-trim contenteditable style="font-size: 18px;">
+          <pre style="width: 95%"><code class="python" data-trim contenteditable style="font-size: 24px;">
 >>> from django.core.cache import cache
 >>> cache.set('my_key', 'hello, world!', 30)
 >>> cache.get('my_key')
@@ -111,10 +121,10 @@ def my_view(request):
 
         <section>
           <h2>Cabeceras de caché</h2>
-          <pre><code style="font-size: 18px;">cache-control: public, max-age=300
+          <pre style="width: 95%"><code style="font-size: 24px;">cache-control: public, max-age=300
 vary: Cookie
 </code></pre>
-          <pre><code class="python" data-trim contenteditable style="font-size: 18px;">
+          <pre style="width: 95%"><code class="python" data-trim contenteditable style="font-size: 24px;">
 from django.views.decorators.cache import cache_control
 from django.views.decorators.cache import patch_cache_control
 from django.views.decorators.vary import vary_on_cookie
@@ -167,11 +177,23 @@ server {
           </section>
           <section>
             <h2>CDN - radiocut.fm - HTML</h2>
-            <img height="600px" src="cdn-html.png" alt="RadioCut">
+            <img height="550px" src="performance-graph-radiocut.fm.png" alt="RadioCut">
+          </section>
+          <section>
+            <h2>CDN - radiocut.fm - HTML</h2>
+            <img max-height="550px" src="performance-radiocut.fm.png" alt="RadioCut">
           </section>
           <section>
             <h2>CDN - radiocut.fm - Estáticos</h2>
-            <img height="600px" src="cdn-static.png" alt="RadioCut">
+            <img height="500px" src="performance-radiocut.com.ar-previo.png" alt="RadioCut">
+          </section>
+          <section>
+            <h2>CDN - radiocut.fm - Estáticos</h2>
+            <img height="550px" src="performance-radiocut.com.ar-post.png" alt="RadioCut">
+          </section>
+          <section>
+            <h2>CDN - radiocut.fm - Estáticos</h2>
+            <img height="500px" src="performance-numbers-radiocut.com.ar-post.png" alt="RadioCut">
           </section>
         </section>
 
@@ -240,12 +262,12 @@ server {
         </section>
         <section>
           <h2>Django Gears</h2>
-          <pre><code data-trim contenteditable style="font-size: 16px;">
+          <pre style="width: 95%"><code data-trim contenteditable style="font-size: 22px;">
 {% load gears %}
 {% css_asset_tag "css/app.css" %}
 {% js_asset_tag "js/app.js" %}
           </code></pre>
-          <pre><code data-trim contenteditable style="font-size: 16px;">
+          <pre style="width: 95%"><code data-trim contenteditable style="font-size: 22px;">
 /* Dependencies:
  *= require ../vendor/jquery
  *= require ../vendor/jquery-ui
@@ -254,7 +276,7 @@ server {
  *= require adsapp
 */
           </code></pre>
-          <pre><code data-trim contenteditable style="font-size: 16px;">
+          <pre style="width: 95%"><code data-trim contenteditable style="font-size: 22px;">
 <link rel="stylesheet" href="//static.radiocut.com.ar/css/app.822d55e6189cea04f96e495e5881f168809f7ea3.css">
           </code></pre>
         </section>
@@ -267,6 +289,14 @@ server {
           </ul>
         </section>
         <section>
+          <h2>Hosted libraries</h2>
+          <ul>
+            <li>https://developers.google.com/speed/libraries/</li>
+            <li>Es probable que esté cacheado en el browser</li>
+            <li>Evita descargas grandes ante cambio de código</li>
+          </ul>
+        </section>
+        <section>
           <h2>Cacheando Páginas</h2>
           <img class="fragment" height="600px" src="maldito-gnarvaja.png" alt="RadioCut">
         </section>
@@ -276,8 +306,36 @@ server {
             <li class="fragment">En pocos casos se pueden cachear páginas completas</li>
             <li class="fragment">Si se pueden cachear partes, pero DENTRO de Django</li>
             <li class="fragment">Alternativa: cargar en javascript partes de la página</li>
-            <li class="fragment">Cachear por API</li>
+            <li class="fragment">API Calls</li>
+            <li class="fragment">Single page application</li>
           </ul>
+        </section>
+        <section>
+          <h2>Imágenes</h2>
+          <ul>
+            <li class="fragment">easy_thumbnails vs imageserver (TM)</li>
+            <li class="fragment">https://bitbucket.org/gnarvaja/imageserver</li>
+            <li class="fragment">Microservicio: con caché afuera</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Imágenes</h2>
+          <pre style="width: 95%"><code data-trim contenteditable style="font-size: 22px;">@app.route("/get/thumb/&lt;int:width&gt;/&lt;int:height&gt;/&lt;path:filename&gt;")
+def get_thumbnail(width, height, filename):
+		try:
+        key, ext = get_key_ext(filename)
+    except InvalidFilenameError, e:
+        return abort(400, str(e))
+    img, cache_control = get_image(filename)
+    img.thumbnail((width, height), Image.ANTIALIAS)
+    output = StringIO()
+    img.save(output, FORMATS[ext.lower()], quality=95)
+    ret = Response(output.getvalue(), content_type=MIME_TYPES[ext.lower()])
+    if cache_control:
+        ret.headers["Cache-Control"] = cache_control
+    return ret
+          </code></pre>
         </section>
 
         <section>
